@@ -53,7 +53,11 @@ function TableList(props) {
     console.log("use effect end");
   }, []);
 
-
+  const add = (e) => {
+    debugger;
+      props.selectedProducts.push(e);
+    console.log(props.selectedProducts);
+  }
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
@@ -67,12 +71,12 @@ function TableList(props) {
           <CardBody>
             <Table
               tableHeaderColor="primary"
-              tableHead={["שם מוצר", "תיאור", "תמונה"]}
+              tableHead={["שם מוצר", "תיאור", "הוספה", "תמונה"]}
               tableData={
                 props.arr ?
                   props.arr.map(i => {
                     return (
-                      [i.name, i.description,<img src={i.img}/>]
+                      [i.name, i.description, <input onClick={()=>{add(i)}} type="button" />, <img src={i.img} />]
                     )
                   })
                   : null
@@ -123,6 +127,9 @@ function TableList(props) {
   );
 }
 const mapStateToProps = (state) => {
-  return { arr: state.productReducer.productArr };
+  return {
+    arr: state.productReducer.productArr,
+    selectedProducts: state.productReducer.selectedProducts
+  };
 }
 export default connect(mapStateToProps, { getAllProducts })(TableList);

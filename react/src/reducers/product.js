@@ -2,7 +2,8 @@ import * as actionTypes from "../actions/actionTypes";
 const initialState = {
     productArr: [],
     selectedProduct: null,
-    updateProduct: null
+    updateProduct: null,
+    selectedProducts:[]
 }
 export const productReducer = (state = initialState, action) => {
     switch (action.type) {

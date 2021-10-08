@@ -25,7 +25,6 @@ function Icons(props) {
   const winner = () => {
     console.log("winner ");
     console.log(props.arr);
-
     props.arr ? props.arr.forEach(element => {
       if (parseFloat(element.customerWeights[element.customerWeights.length - 2].currentWeight) -
         parseFloat(element.customerWeights[element.customerWeights.length - 1].currentWeight) > maxLostWeight) {
