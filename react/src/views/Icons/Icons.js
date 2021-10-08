@@ -27,7 +27,6 @@ function Icons(props) {
     console.log(props.arr);
 
     props.arr ? props.arr.forEach(element => {
-      debugger;
       if (parseFloat(element.customerWeights[element.customerWeights.length - 2].currentWeight) -
         parseFloat(element.customerWeights[element.customerWeights.length - 1].currentWeight) > maxLostWeight) {
         maxLostWeight = parseFloat(element.customerWeights[element.customerWeights.length - 2].currentWeight) -

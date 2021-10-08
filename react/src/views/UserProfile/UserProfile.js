@@ -16,13 +16,10 @@ import CardFooter from "components/Card/CardFooter.js";
 import avatar from "assets/img/faces/marc.jpg";
 import 'semantic-ui-css/semantic.min.css';
 import { Form, Checkbox, Label } from "semantic-ui-react";
-// import React, { useRef, useState, useEffect } from 'react'
-// import { Button, Form, Grid, Header, Icon, Message, Segment, Divider, Label } from 'semantic-ui-react'
-
-
 
 import { connect } from "react-redux";
-import { postCustomer } from "../../actions/customer"//צריך לסדר את זה
+import { getAllCustomers,postCustomer } from "../../actions/customer";
+
 
 const styles = {
   cardCategoryWhite: {
@@ -85,7 +82,6 @@ export function UserProfile(props) {
   let genderInput = useRef(null);
   const [genderValid, setGenderValid] = useState(true);//לעשות ולידציות
   const [gender, setGender] = useState(true);
-
   const joinDate = Date();
   const customerWeights = [{ date: joinDate, currentWeight: weight }];
   const [log, setLog] = useState(false);
@@ -105,28 +101,53 @@ export function UserProfile(props) {
     var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
     if (!pattern.test(mail) || (!pattern.test(mail) && mailInput !== null)) { setMailValid(false); } else setMailValid(true);
   }, [firstName, firstNameValid, lastName, lastNameValid, phone, phoneValid, mail, mailValid, password, passwordValid, height, heightValid, weight, weightValid, age, ageValid, chest, chestValid, pelvis, pelvisValid, waist, waistValid, city, cityValid, gender, genderValid])
-  const submit = () => {
-    if (firstNameValid && lastNameValid && phoneValid && mailValid && passwordValid && heightValid && weightValid && ageValid && pelvisValid && waistValid && chestValid && cityValid && genderValid) {
-      // let customer = { firstName, lastName, city, mail,height , gender, phone, password, chest, waist, pelvis, joinDate, customerWeights };
-      let customer = {
-        firstName: firstName,
-        lastName: lastName,
-        city: city,
-        email: mail,
-        height: height,
-        gender: gender,
-        phone: phone,
-        password: password,
-        chest: chest,
-        waist: waist,
-        pelvis: pelvis,
-        customerWeights: customerWeights,
-        joinDate: joinDate
-      };
-      props.postCustomer(customer);
-      console.log(customer);
+
+  const submit1 = () => {
+    //לוקח את כל הלקוחות ומסנן רק את המיילים ששוים למייל שהלקוח הכניס
+    console.log(props.getAllCustomers());
+    
+    let email = props.getAllCustomers.data.filter(c => c.mail == mail)
+    if (!email) {
+      if (firstNameValid && lastNameValid && phoneValid && mailValid && passwordValid && heightValid && weightValid && ageValid && pelvisValid && waistValid && chestValid && cityValid && genderValid) {
+        let customer = {
+          name: firstName,
+          lastName: lastName,
+          city: city,
+          mail: mail,
+          height: height,
+          gender: gender,
+          phone: phone,
+          password: password,
+          chest: chest,
+          waist: waist,
+          pelvis: pelvis,
+          customerWeights: customerWeights,
+          joinDate: joinDate
+        };
+        props.postCustomer(customer);
+        console.log(customer);
+        return (<Label basic color='red' pointing>נרשמת בהצלחה ברוך הבא</Label>);
+      }
+    } else {
+      //אם יש לקוח בעל אותו מייל
+      //צריך להציג לו הודעה שהמשתמש קיים במערכת
+      console.log("שם המשתמש כבר קיים במערכת");
+      return (<Label basic color='red' pointing>שם המשתמש כבר קיים במערכת</Label>);
+    }
+
+  }
+  const submit2 = () => {
+    let email = props.getAll.filter(c => c.mail == mail)
+    if (email) {
+      console.log("ברוך הבא", mail);
+      return (<Label basic color='red' pointing>התחברת בהצלחה ברוך הבא</Label>);
+
+    } else {
+      console.log("שם המשתמש לא קיים במערכת אנא הרשם קודם")
+      return (<Label basic color='red' pointing>שם המשתמש לא קיים במערכת אנא הרשם קודם</Label>);
 
     }
+
   }
   const signIn = () => {
     setLog(true);
@@ -139,24 +160,24 @@ export function UserProfile(props) {
   }
   return (
     <div >
-      <GridContainer >
+      <GridContainer>
         <GridItem xs={12} sm={12} md={8}>
           <Card>
-            <CardHeader color="primary" >
+            <CardHeader color="primary">
               <CardHeader color="primary">
                 <Button color="green" className={classes.cardTitleWhite} onClick={() => { signIn() }}>התחברות</Button>
                 <Button color="green" className={classes.cardTitleWhite} onClick={() => { signUp() }}>הרשמה</Button>
               </CardHeader>
             </CardHeader>
-            {/* צריך לחבר את שני הדיבים האלו איכשהוא לסטייט כדי שכל פעם יתרענן אם הלוג טרו או פולס */}
+            {}
             {log && <div>
-              <CardHeader color="primary" >
+              <CardHeader color="primary">
                 <h4 className={classes.cardTitleWhite}>התחברות</h4>
               </CardHeader>
-              <CardBody >
+              <CardBody>
                 <h5 as='h7' color='teal' textAlign='right'>:פרטים אישיים</h5>
 
-                <GridContainer >
+                <GridContainer>
 
                   <GridItem xs={12} sm={12} md={4}>
 
@@ -175,7 +196,7 @@ export function UserProfile(props) {
                   <GridContainer>
                     {/* לעשות פונקציה של אישור היתחברות */}
                     <CardFooter>
-                      <Button color="primary" onClick={() => { submit() }}>אישור</Button>
+                      <Button color="primary" onClick={() => { submit2() }}>אישור</Button>
                     </CardFooter>
                   </GridContainer>
                 </GridContainer>
@@ -186,8 +207,8 @@ export function UserProfile(props) {
                 <h4 className={classes.cardTitleWhite}>הרשם לאתרינו</h4>
                 <p className={classes.cardCategoryWhite}>אנא הכנס את פרטייך שדות שמסומנים בכוכבים הינם שדות חובה</p>
               </CardHeader>
-              <CardBody >
-                <h5 as='h7' color='teal' textAlign='right'>פרטים אישיים:</h5>
+              <CardBody>
+                <h5 as='h7' color='teal' textAlign='right'>:פרטים אישיים</h5>
 
                 <GridContainer>
 
@@ -239,14 +260,12 @@ export function UserProfile(props) {
                         let x = cityInput.current.value;
                         setCity(x);
                       }} />
-                    {
-                      !cityValid ? <Label basic color='red' pointing>
-                        בבקשה הכנס עיר מגורים
+                    {!cityValid ? <Label basic color='red' pointing>
+                      בבקשה הכנס עיר מגורים
                       </Label> : null}
-
                   </GridItem>
                 </GridContainer>
-                <h5 as='h7' color='teal' textAlign='right'>נתונים:</h5>
+                <h5 as='h7' color='teal' textAlign='right'>:נתונים</h5>
 
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={4}>
@@ -278,7 +297,7 @@ export function UserProfile(props) {
                   </Label> : null}
                   </GridItem>
                 </GridContainer>
-                <h5 as='h7' color='teal' textAlign='right'>מין:</h5>
+                <h5 as='h7' color='teal' textAlign='right'>:מין</h5>
 
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={12}>
@@ -288,7 +307,7 @@ export function UserProfile(props) {
                     </Form>
                   </GridItem>
                 </GridContainer>
-                <h5 as='h7' color='teal' textAlign='right'>הקפים:</h5>
+                <h5 as='h7' color='teal' textAlign='right'>:הקפים</h5>
 
                 <GridContainer>
                   <br />
@@ -350,7 +369,8 @@ export function UserProfile(props) {
               New to us? <a href='#'>Sign Up</a>
             </div> */}
               <CardFooter>
-                <Button color="primary" onClick={() => { submit() }}>אישור</Button>
+                <Button color="primary" onClick={() => { submit1() }}>אישור</Button>
+
               </CardFooter>
             </div>}
           </Card>
@@ -362,5 +382,5 @@ export function UserProfile(props) {
 const mapStateToProps = (state) => {
   return { arr: state.customerArr };
 }
-export default connect(mapStateToProps, { postCustomer })(UserProfile);
+export default connect(mapStateToProps, { postCustomer,getAllCustomers })(UserProfile);
 
